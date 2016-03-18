@@ -15,8 +15,10 @@ do
 
     for container_env in $containers
     do
-      # Get the name and schedule of this container.
+      # Get the name and schedule of this container. (Mask - with _, _ with __)
       container=$(echo $container_env | cut -c11-)
+      container=${container//_/-}
+      container=${container//--/_}
       container_schedule=${!container_env}
 
       # Add entry to the cron file.
