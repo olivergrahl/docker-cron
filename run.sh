@@ -23,7 +23,7 @@ do
 
       # Add entry to the cron file.
 cat <<EOF >> /tmp/cron.tmp
-${container_schedule} curl --unix-socket /var/run/docker.sock -X POST http:/containers/${container}/start
+${container_schedule} curl --unix-socket /var/run/docker.sock -X POST http://containers/${container}/start
 EOF
     done
 
