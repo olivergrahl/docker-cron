@@ -8,27 +8,20 @@ done
 
 while true
 do
-    env_vars=$(env | grep ".*_TUTUM_API_URL=" | cut -d= -f1 | tr '\n' ' ')
+    containers=$(env | grep "CONTAINER_.*=" | cut -d= -f1 | tr '\n' ' ')
 
+    # Clear the cron file.
     [ ! -f /tmp/cron.tmp ] || rm /tmp/cron.tmp
 
-    for env_var in $env_vars
+    for container_env in $containers
     do
-      # Set on the remote service
-      schedule_env_var=${env_var%_TUTUM_API_URL}_ENV_CRON_SCHEDULE
-      #  Set on the cron service
-      schedule_var=${env_var%_TUTUM_API_URL}_CRON_SCHEDULE
+      # Get the name and schedule of this container.
+      container=$(echo $container_env | cut -c11-)
+      container_schedule=${!container_env}
 
-      if [[ -n $schedule_var ]]
-      then
-        schedule="${!schedule_var}"
-      else
-        schedule="${!schedule_env_var}"
-      fi
-      service_url=${!env_var}
-
+      # Add entry to the cron file.
 cat <<EOF >> /tmp/cron.tmp
-${schedule} curl -X POST -H "Authorization: $DOCKERCLOUD_AUTH" -H "Accept: application/json" ${service_url}start/
+${container_schedule} curl --unix-socket /var/run/docker.sock -X POST http:/containers/${container}/start
 EOF
     done
 
