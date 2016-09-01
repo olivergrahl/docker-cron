@@ -26,9 +26,11 @@ do
         schedule="${!schedule_env_var}"
       fi
       service_url=${!env_var}
+      
+      service_cmd=${SERVICE_COMMAND:=start}
 
 cat <<EOF >> /tmp/cron.tmp
-${schedule} curl -X POST -H "Authorization: $DOCKERCLOUD_AUTH" -H "Accept: application/json" ${service_url}start/
+${schedule} curl -X POST -H "Authorization: $DOCKERCLOUD_AUTH" -H "Accept: application/json" ${service_url}${service_cmd}/
 EOF
     done
 
